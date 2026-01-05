@@ -88,9 +88,7 @@ export default function Dashboard() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">
-            FloraPro
-          </h2>
+          <h2 className="text-xl font-semibold text-slate-800 mb-2">Flora</h2>
           <p className="text-slate-600">Initializing dashboard...</p>
         </div>
       </div>
@@ -106,7 +104,7 @@ export default function Dashboard() {
         <header className="text-center mb-8 mt-8">
           <div>
             <h1 className="text-5xl md:text-6xl font-bold gradient-text mb-2">
-              FloraPro
+              Flora
             </h1>
             <p className="text-slate-600 text-lg">
               Intelligent Environmental Monitoring System
@@ -194,7 +192,7 @@ export default function Dashboard() {
 
         {/* Footer */}
         <footer className="text-center text-slate-500 text-sm py-8 border-t border-slate-200/50">
-          <p className="mb-2">FloraPro IoT System • By Danke Hidayat</p>
+          <p className="mb-2">Flora • By Danke Hidayat</p>
           <p>PT. Labdha Teknika Nusantara</p>
         </footer>
       </div>
