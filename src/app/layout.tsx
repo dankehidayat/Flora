@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "FloraPro Dashboard",
   description:
-    "Real-time environmental monitoring system by Danke Hidayat - Labdha Teknika Nusantara",
+    "Real-time environmental monitoring system by Danke Hidayat - PT. Labdha Teknika Nusantara",
 };
 
 export default function RootLayout({
