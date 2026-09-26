@@ -1,200 +1,204 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { SensorCard } from "./components/sensor-card";
-import { SoilMoistureGauge } from "./components/soil-moisture-gauge";
-import { StatusIndicator } from "./components/status-indicator";
-import { RtcDisplay } from "./components/rtc-display";
-import { Navbar } from "./components/navbar";
-import { SensorData, DashboardStats } from "@/types/sensor";
-import { Thermometer, CloudRain, Gauge, Mountains } from "phosphor-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { BandState, PinReadings, SensorResponse } from "@/types/sensor";
+import { SoilBand } from "./components/soil-band";
+import { WeftStrip } from "./components/weft-strip";
+import { Selvedge, type DeviceClock } from "./components/selvedge";
+import { Foot } from "./components/foot";
+import { COPY } from "./copy";
+
+const POLL_MS = 5000;
+
+/** Soil moisture pins. v4, v5, v6 — the binding firmware pin map. */
+const SOIL_PINS = ["v4", "v5", "v6"] as const;
+
+type NumberMap = Record<string, number | null>;
+
+/**
+ * Read the device RTC out of pins v10-v15. Returns null unless every field is a
+ * finite number inside its real range, so a partially-read clock is never shown
+ * as a whole one.
+ */
+function toDeviceClock(readings: PinReadings | null): DeviceClock | null {
+  if (!readings) return null;
+
+  const { v10, v11, v12, v13, v14, v15 } = readings;
+
+  const reported = [v10, v11, v12, v13, v14, v15];
+  if (reported.some((value) => typeof value !== "number" || !Number.isFinite(value))) {
+    return null;
+  }
+
+  const year = v10 as number;
+  const month = v11 as number;
+  const day = v12 as number;
+  const hour = v13 as number;
+  const minute = v14 as number;
+  const second = v15 as number;
+
+  if (month < 1 || month > 12) return null;
+  if (day < 1 || day > 31) return null;
+  if (hour < 0 || hour > 23) return null;
+  if (minute < 0 || minute > 59) return null;
+  if (second < 0 || second > 59) return null;
+
+  return { year, month, day, hour, minute, second };
+}
 
 export default function Dashboard() {
-  const [sensorData, setSensorData] = useState<DashboardStats | null>(null);
-  const [lastUpdate, setLastUpdate] = useState<string>("Loading...");
-  const [isOnline, setIsOnline] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [readings, setReadings] = useState<PinReadings | null>(null);
+  const [settled, setSettled] = useState(false);
+  const [live, setLive] = useState(false);
 
-  const fetchSensorData = async () => {
+  /** Has this pin ever reported on this page? Drives drained vs unmeasured. */
+  const [everReported, setEverReported] = useState<Record<string, boolean>>({});
+  /** The last value each pin actually reported, kept only to draw a ghost. */
+  const [lastGood, setLastGood] = useState<NumberMap>({});
+  /** Stripes at or above this index arrived on the latest poll. */
+  const [newFrom, setNewFrom] = useState<NumberMap>({});
+  /** The One Flash Rule: a reading is sumatan for exactly one poll. */
+  const [flashing, setFlashing] = useState<Record<string, boolean>>({});
+
+  const previousSoil = useRef<NumberMap>({});
+  const clockBase = useRef<{ second: number; at: number } | null>(null);
+  const [interpolatedSecond, setInterpolatedSecond] = useState<number | null>(null);
+
+  const poll = useCallback(async () => {
     try {
-      const response = await fetch("/api/sensor-data");
-      const result = await response.json();
+      const response = await fetch("/api/sensor-data", { cache: "no-store" });
+      const body = (await response.json()) as SensorResponse;
 
-      if (result.success) {
-        const data: SensorData = result.data;
-
-        // Format RTC time
-        const rtcTime = {
-          year: data.v10 || new Date().getFullYear(),
-          month: data.v11 || new Date().getMonth() + 1,
-          day: data.v12 || new Date().getDate(),
-          hour: data.v13 || new Date().getHours(),
-          minute: data.v14 || new Date().getMinutes(),
-          second: data.v15 || new Date().getSeconds(),
-          formatted: `${String(data.v13 || 0).padStart(2, "0")}:${String(
-            data.v14 || 0
-          ).padStart(2, "0")}:${String(data.v15 || 0).padStart(2, "0")}`,
-          fullFormatted: `${data.v10 || 0}-${String(data.v11 || 0).padStart(
-            2,
-            "0"
-          )}-${String(data.v12 || 0).padStart(2, "0")}`,
-        };
-
-        const stats: DashboardStats = {
-          temperature: data.v0 || 0,
-          humidity: data.v1 || 0,
-          pressure: data.v2 || 0,
-          altitude: data.v3 || 0,
-          soilMoisture: {
-            soil1: {
-              percentage: data.v4 || 0,
-              raw: data.v7 || 0,
-            },
-            soil2: {
-              percentage: data.v5 || 0,
-              raw: data.v8 || 0,
-            },
-            soil3: {
-              percentage: data.v6 || 0,
-              raw: data.v9 || 0,
-            },
-          },
-          rtcTime: rtcTime,
-          lastUpdate: new Date().toLocaleTimeString(),
-        };
-
-        setSensorData(stats);
-        setLastUpdate(new Date().toLocaleTimeString());
-        setIsOnline(true);
-      } else {
-        setIsOnline(false);
+      if (!body.success || !body.readings) {
+        // The One Flash Rule: a flash expires whether or not the next poll
+        // succeeds, so it always lasts exactly one poll and never lingers as a
+        // false "just changed".
+        setFlashing({});
+        setLive(false);
+        setSettled(true);
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching sensor data:", error);
-      setIsOnline(false);
-    } finally {
-      setIsLoading(false);
+
+      const next = body.readings;
+      setReadings(next);
+      setLive(true);
+      setSettled(true);
+
+      setEverReported((prev) => {
+        const copy = { ...prev };
+        for (const [pin, value] of Object.entries(next)) {
+          if (typeof value === "number") copy[pin] = true;
+        }
+        return copy;
+      });
+
+      setLastGood((prev) => {
+        const copy = { ...prev };
+        for (const [pin, value] of Object.entries(next)) {
+          if (typeof value === "number") copy[pin] = value;
+        }
+        return copy;
+      });
+
+      // The signature: a band grows by exactly the stripes the device reported
+      // gaining. A falling value loses dye and animates nothing. The flash
+      // marks a *change* between two readings, so the page's first reading is
+      // never announced as a change and never opens in sumatan.
+      const arrived: Record<string, boolean> = {};
+      const from: NumberMap = {};
+      for (const pin of SOIL_PINS) {
+        const value = next[pin];
+        const before = previousSoil.current[pin];
+        from[pin] = typeof before === "number" ? before : 0;
+        if (typeof before === "number" && typeof value === "number" && value !== before) {
+          arrived[pin] = true;
+        }
+      }
+      setNewFrom(from);
+      setFlashing(arrived);
+      previousSoil.current = { v4: next.v4 ?? null, v5: next.v5 ?? null, v6: next.v6 ?? null };
+
+      if (typeof next.v15 === "number") {
+        clockBase.current = { second: next.v15, at: Date.now() };
+      }
+    } catch {
+      setFlashing({});
+      setLive(false);
+      setSettled(true);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchSensorData();
-    const interval = setInterval(fetchSensorData, 5000);
+    // The first poll is deferred so the effect body itself never sets state.
+    const kickoff = setTimeout(() => void poll(), 0);
+    const interval = setInterval(() => void poll(), POLL_MS);
+    return () => {
+      clearTimeout(kickoff);
+      clearInterval(interval);
+    };
+  }, [poll]);
+
+  // The device seconds field is interpolated between polls, as the product
+  // always has. It holds at 59 rather than rolling into a minute the device has
+  // not reported yet. Interpolation happens off the render path, so the markup
+  // the server sends and the markup the client first paints agree.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const base = clockBase.current;
+      setInterpolatedSecond(
+        base ? Math.min(59, base.second + Math.floor((Date.now() - base.at) / 1000)) : null
+      );
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">Flora</h2>
-          <p className="text-slate-600">Initializing dashboard...</p>
-        </div>
-      </div>
-    );
-  }
+  const baseClock = toDeviceClock(readings);
+
+  const clock: DeviceClock | null =
+    baseClock && interpolatedSecond !== null
+      ? { ...baseClock, second: interpolatedSecond }
+      : baseClock;
+
+  const stateOf = useCallback(
+    (pin: string): BandState => {
+      const value = readings?.[pin];
+      if (typeof value === "number") return "live";
+      // everReported can only be set by a poll that reached a pin, so it implies
+      // a settled page; the old `settled &&` conjunct was dead logic.
+      if (everReported[pin]) return "drained";
+      return "unmeasured";
+    },
+    [readings, everReported]
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 custom-scrollbar">
-      <Navbar />
+    <div className="cloth">
+      <div className="cloth-body">
+        <Selvedge clock={clock} live={live} waiting={!settled} />
 
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header - Simplified without leaf icon */}
-        <header className="text-center mb-8 mt-8">
-          <div>
-            <h1 className="text-5xl md:text-6xl font-bold gradient-text mb-2">
-              Flora
-            </h1>
-            <p className="text-slate-600 text-lg">
-              Intelligent Environmental Monitoring System
-            </p>
-          </div>
-        </header>
+        <main>
+          <h1 className="title">{COPY.title}</h1>
 
-        {/* Compact Status Section */}
-        <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <StatusIndicator isOnline={isOnline} lastUpdate={lastUpdate} />
-          {sensorData?.rtcTime && <RtcDisplay rtcTime={sensorData.rtcTime} />}
-        </div>
+          {SOIL_PINS.map((pin, index) => {
+            const value = readings?.[pin] ?? null;
+            return (
+              <SoilBand
+                key={pin}
+                index={index + 1}
+                value={value}
+                state={stateOf(pin)}
+                ghost={lastGood[pin] ?? 0}
+                newFrom={newFrom[pin] ?? 0}
+                flash={Boolean(flashing[pin])}
+                pending={!settled}
+              />
+            );
+          })}
 
-        {/* Environmental Sensors Grid */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-800 mb-6 text-center">
-            Environmental Sensors
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <SensorCard
-              title="Temperature"
-              value={sensorData?.temperature.toFixed(1) || "0.0"}
-              unit="°C"
-              icon={<Thermometer size={24} weight="fill" />}
-              gradient="from-orange-500 to-red-500"
-              description="Ambient temperature from AHT20 sensor"
-              trend="stable"
-            />
+          <WeftStrip readings={readings} stateOf={stateOf} pending={!settled} />
+        </main>
 
-            <SensorCard
-              title="Humidity"
-              value={sensorData?.humidity.toFixed(1) || "0.0"}
-              unit="%"
-              icon={<CloudRain size={24} weight="fill" />}
-              gradient="from-blue-500 to-cyan-500"
-              description="Relative humidity from AHT20 sensor"
-              trend="stable"
-            />
-
-            <SensorCard
-              title="Pressure"
-              value={sensorData?.pressure.toFixed(0) || "0"}
-              unit="hPa"
-              icon={<Gauge size={24} weight="fill" />}
-              gradient="from-purple-500 to-pink-500"
-              description="Atmospheric pressure from BMP280"
-              trend="stable"
-            />
-
-            <SensorCard
-              title="Altitude"
-              value={sensorData?.altitude.toFixed(0) || "0"}
-              unit="m"
-              icon={<Mountains size={24} weight="fill" />}
-              gradient="from-emerald-500 to-teal-500"
-              description="Calculated altitude from BMP280"
-              trend="stable"
-            />
-          </div>
-        </section>
-
-        {/* Soil Moisture Section - Simplified */}
-        <section className="mb-12">
-          <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-slate-800">Soil Moisture</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <SoilMoistureGauge
-              soilNumber={1}
-              percentage={sensorData?.soilMoisture.soil1.percentage || 0}
-              rawValue={sensorData?.soilMoisture.soil1.raw || 0}
-            />
-            <SoilMoistureGauge
-              soilNumber={2}
-              percentage={sensorData?.soilMoisture.soil2.percentage || 0}
-              rawValue={sensorData?.soilMoisture.soil2.raw || 0}
-            />
-            <SoilMoistureGauge
-              soilNumber={3}
-              percentage={sensorData?.soilMoisture.soil3.percentage || 0}
-              rawValue={sensorData?.soilMoisture.soil3.raw || 0}
-            />
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="text-center text-slate-500 text-sm py-8 border-t border-slate-200/50">
-          <p className="mb-2">Flora • By Danke Hidayat</p>
-          <p>PT. Labdha Teknika Nusantara</p>
-        </footer>
+        <Foot />
       </div>
     </div>
   );

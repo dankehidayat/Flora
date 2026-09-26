@@ -1,9 +1,19 @@
+import { COPY } from "./copy";
+
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 flex items-center justify-center">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Not Found</h2>
-        <p className="text-slate-600">Could not find requested resource</p>
+    <div className="cloth">
+      <div className="cloth-body">
+        <header className="selvedge">
+          <span className="selvedge-mark">{COPY.wordmark}</span>
+        </header>
+
+        <main>
+          <h1 className="title">{COPY.notFoundTitle}</h1>
+          <p className="prose" style={{ paddingBlock: 12 }}>
+            {COPY.notFoundBody}
+          </p>
+        </main>
       </div>
     </div>
   );

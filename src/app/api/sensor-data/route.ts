@@ -1,9 +1,46 @@
 import { NextResponse } from "next/server";
+import type { PinReadings } from "@/types/sensor";
 
-// Helper function to fetch individual sensor value
-async function fetchSensorValue(url: string, pin: string): Promise<number> {
+export const dynamic = "force-dynamic";
+
+/**
+ * The firmware pin map. Fixed by the ESP32 project and not open to redesign.
+ * v0 temperature, v1 humidity, v2 pressure, v3 altitude, v4-v6 soil moisture
+ * percentages, v7-v9 raw soil values, v10-v15 the device RTC fields.
+ */
+const SENSOR_PINS = [
+  "v0",
+  "v1",
+  "v2",
+  "v3",
+  "v4",
+  "v5",
+  "v6",
+  "v7",
+  "v8",
+  "v9",
+  "v10",
+  "v11",
+  "v12",
+  "v13",
+  "v14",
+  "v15",
+] as const;
+
+const PIN_TIMEOUT_MS = 3000;
+
+/**
+ * Fetch one pin.
+ *
+ * Returns `number` only when the pin genuinely reported a finite number.
+ * Every failure mode - non-OK status, aborted after the timeout, malformed
+ * body, unparseable text - returns `null`. It never returns `0`: a pin that
+ * cannot be read has not measured zero, and reporting it as zero would make an
+ * outage indistinguishable from a real reading at the far end of the wire.
+ */
+async function fetchPin(url: string, pin: string): Promise<number | null> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  const timeoutId = setTimeout(() => controller.abort(), PIN_TIMEOUT_MS);
 
   try {
     const response = await fetch(url, {
@@ -11,115 +48,76 @@ async function fetchSensorValue(url: string, pin: string): Promise<number> {
       cache: "no-store",
     });
 
-    clearTimeout(timeoutId);
-
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.warn(`Pin ${pin} returned HTTP ${response.status}; treating as unreported.`);
+      return null;
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? parseFloat(data[0]) : parseFloat(data);
+    const parsed = Array.isArray(data) ? parseFloat(data[0]) : parseFloat(data);
+
+    if (!Number.isFinite(parsed)) {
+      console.warn(`Pin ${pin} returned a non-numeric body; treating as unreported.`);
+      return null;
+    }
+
+    return parsed;
   } catch (error) {
-    console.error(`Error fetching sensor V${pin}:`, error);
-    return 0;
+    console.warn(`Pin ${pin} could not be read; treating as unreported.`, error);
+    return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
-// Helper function to fetch all sensor values in parallel
-async function fetchAllSensors() {
-  const BLYNK_BASE_URL = process.env.BLYNK_BASE_URL;
-  const BLYNK_AUTH_TOKEN = process.env.BLYNK_AUTH_TOKEN;
+async function fetchAllPins(): Promise<PinReadings> {
+  const baseUrl = process.env.BLYNK_BASE_URL;
+  const authToken = process.env.BLYNK_AUTH_TOKEN;
 
-  // Validate environment variables
-  if (!BLYNK_BASE_URL || !BLYNK_AUTH_TOKEN) {
+  if (!baseUrl || !authToken) {
     throw new Error(
-      "Blynk environment variables not configured:\n" +
-        "Please add BLYNK_BASE_URL and BLYNK_AUTH_TOKEN to your .env.local file"
+      "Blynk environment variables not configured: add BLYNK_BASE_URL and BLYNK_AUTH_TOKEN to .env.local"
     );
   }
 
-  const sensorPins = [
-    "v0",
-    "v1",
-    "v2",
-    "v3",
-    "v4",
-    "v5",
-    "v6",
-    "v7",
-    "v8",
-    "v9",
-    "v10",
-    "v11",
-    "v12",
-    "v13",
-    "v14",
-    "v15", // RTC time data
-  ];
+  // Pins are fetched in parallel and settle independently: one dead pin must
+  // never take the other fifteen readings down with it.
+  const settled = await Promise.all(
+    SENSOR_PINS.map((pin) => fetchPin(`${baseUrl}/${authToken}/get/${pin}`, pin))
+  );
 
-  try {
-    const sensorPromises = sensorPins.map((pin) => {
-      const url = `${BLYNK_BASE_URL}/${BLYNK_AUTH_TOKEN}/get/${pin}`;
-      return fetchSensorValue(url, pin);
-    });
+  const readings: PinReadings = {};
+  SENSOR_PINS.forEach((pin, index) => {
+    readings[pin] = settled[index];
+  });
 
-    const sensorValues = await Promise.all(sensorPromises);
-
-    return {
-      v0: sensorValues[0], // Temperature
-      v1: sensorValues[1], // Humidity
-      v2: sensorValues[2], // Pressure
-      v3: sensorValues[3], // Altitude
-      v4: sensorValues[4], // Soil 1 moisture %
-      v5: sensorValues[5], // Soil 2 moisture %
-      v6: sensorValues[6], // Soil 3 moisture %
-      v7: sensorValues[7], // Soil 1 raw value
-      v8: sensorValues[8], // Soil 2 raw value
-      v9: sensorValues[9], // Soil 3 raw value
-      v10: sensorValues[10], // Year
-      v11: sensorValues[11], // Month
-      v12: sensorValues[12], // Day
-      v13: sensorValues[13], // Hour
-      v14: sensorValues[14], // Minute
-      v15: sensorValues[15], // Second
-    };
-  } catch (error) {
-    console.error("Error fetching all sensors:", error);
-    throw error;
-  }
+  return readings;
 }
 
 export async function GET() {
   try {
-    const sensorData = await fetchAllSensors();
+    const readings = await fetchAllPins();
 
+    // 200 even when every pin is unreported: the route itself worked, and the
+    // per-pin `null`s already say everything the interface is allowed to say.
     return NextResponse.json({
       success: true,
-      data: sensorData,
-      timestamp: new Date().toISOString(),
+      readings,
+      measuredAt: new Date().toISOString(),
     });
   } catch (error) {
     console.error("Error in sensor data API:", error);
 
-    if (
-      error instanceof Error &&
-      error.message.includes("environment variables")
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Server configuration error: " + error.message,
-          timestamp: new Date().toISOString(),
-        },
-        { status: 500 }
-      );
-    }
+    const isConfigError =
+      error instanceof Error && error.message.includes("environment variables");
 
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch sensor data from Blynk server",
-        timestamp: new Date().toISOString(),
+        error: isConfigError
+          ? "Server configuration error: " + error.message
+          : "Failed to read the sensor pins from the Blynk server",
+        measuredAt: new Date().toISOString(),
       },
       { status: 500 }
     );

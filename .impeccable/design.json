@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-26T18:05:00.000Z",
+  "title": "Design System: Flora",
+  "extensions": {
+    "colorMeta": {
+      "indigo": {
+        "role": "primary",
+        "displayName": "Natural Indigo",
+        "canonical": "#1f3a5f",
+        "tonalRamp": [
+          "#13233a",
+          "#213d64",
+          "#2e578e",
+          "#3c71b9",
+          "#618ecc",
+          "#8cacd9",
+          "#bacde8",
+          "#ecf1f9"
+        ]
+      },
+      "indigo-deep": {
+        "role": "primary",
+        "displayName": "Indigo, Deep \u2014 the quiet half",
+        "canonical": "#16293f",
+        "tonalRamp": [
+          "#030c18",
+          "#14263b",
+          "#2f435b",
+          "#4e637c",
+          "#6e849f",
+          "#90a7c3",
+          "#bccbdd",
+          "#e8eff8"
+        ]
+      },
+      "sumatan": {
+        "role": "secondary",
+        "displayName": "Sumatan Red",
+        "canonical": "#8c3a2b",
+        "tonalRamp": [
+          "#3b1812",
+          "#652a1f",
+          "#903c2c",
+          "#bb4e3a",
+          "#ce705f",
+          "#db968a",
+          "#e9c0b9",
+          "#f9eeeb"
+        ]
+      },
+      "kebom": {
+        "role": "tertiary",
+        "displayName": "Kebom Green",
+        "canonical": "#5f7355",
+        "tonalRamp": [
+          "#242c21",
+          "#3f4c38",
+          "#5a6d50",
+          "#748d68",
+          "#91a687",
+          "#afbea7",
+          "#cfd8ca",
+          "#f2f4f0"
+        ]
+      },
+      "cotton": {
+        "role": "neutral",
+        "displayName": "Undyed Cotton",
+        "canonical": "#f2efe4",
+        "tonalRamp": [
+          "#342e19",
+          "#5a502b",
+          "#7f713d",
+          "#a59350",
+          "#bbab72",
+          "#cdc298",
+          "#e1dac1",
+          "#f7f5ee"
+        ]
+      },
+      "warp": {
+        "role": "neutral",
+        "displayName": "Undyed Warp",
+        "canonical": "#b0a695",
+        "tonalRamp": [
+          "#0f0a04",
+          "#2b2417",
+          "#494132",
+          "#696050",
+          "#8b8171",
+          "#aea493",
+          "#cfc8bd",
+          "#f1eee9"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Weaver's Ink",
+        "canonical": "#2b2622",
+        "tonalRamp": [
+          "#2b2622",
+          "#4a413b",
+          "#695d53",
+          "#89796c",
+          "#a3958a",
+          "#bbb2aa",
+          "#d6d1cc",
+          "#f4f2f1"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#6b6558",
+        "tonalRamp": [
+          "#2a2823",
+          "#49453c",
+          "#686255",
+          "#867f6e",
+          "#a19a8c",
+          "#bab5ab",
+          "#d6d3cd",
+          "#f3f3f1"
+        ]
+      },
+      "slack": {
+        "role": "neutral",
+        "displayName": "Slack Ash \u2014 the never-reported bar",
+        "canonical": "#8f8674",
+        "tonalRamp": [
+          "#0f0a03",
+          "#2b2415",
+          "#494131",
+          "#69604f",
+          "#8a816f",
+          "#ada491",
+          "#cfc8bc",
+          "#f1eee9"
+        ]
+      },
+      "drained": {
+        "role": "neutral",
+        "displayName": "Drained Cloth \u2014 the ghost stripe",
+        "canonical": "#8a8170",
+        "tonalRamp": [
+          "#0f0a04",
+          "#2b2416",
+          "#494132",
+          "#696050",
+          "#8a8170",
+          "#ada492",
+          "#cfc8bd",
+          "#f1eee9"
+        ]
+      },
+      "selvedge": {
+        "role": "neutral",
+        "displayName": "Selvedge Rule",
+        "canonical": "#948b78",
+        "tonalRamp": [
+          "#0f0b03",
+          "#2b2415",
+          "#494130",
+          "#69604e",
+          "#8a816f",
+          "#ada491",
+          "#cfc9bc",
+          "#f1eee8"
+        ]
+      },
+      "leader": {
+        "role": "neutral",
+        "displayName": "Leader Hairline",
+        "canonical": "#a49a88",
+        "tonalRamp": [
+          "#0f0a04",
+          "#2c2416",
+          "#494131",
+          "#69604f",
+          "#8b8170",
+          "#aea492",
+          "#cfc8bc",
+          "#f1eee9"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "value": {
+        "displayName": "Value (Chivo 800)",
+        "purpose": "The soil percentage. The largest ink on the page; tabular so a changing count never shifts width. Right-aligned in a 4ch field."
+      },
+      "unit": {
+        "displayName": "Unit (Chivo 600)",
+        "purpose": "The %, \u00b0C, hPa and m. 0.4em of the value and 0.75em of the weft value so it is one absolute size in both contexts. Keeps the quantity's hue in its deepest form: part of the fact, quieter half."
+      },
+      "weft": {
+        "displayName": "Weft value (Chivo 700)",
+        "purpose": "The four air readings, a size down, in fixed decimal places, in an 8ch field wide enough for the longest so every leader is the same length."
+      },
+      "title": {
+        "displayName": "Title (Archivo 700, indigo-deep)",
+        "purpose": "The page title, the only heading. Modest by design: the largest ink belongs to the measurement. Its rank comes from hue, not size, because a hue step survives glare that three pixels of type size does not."
+      },
+      "label": {
+        "displayName": "Label (Archivo 600)",
+        "purpose": "Probe names and air reading names \u2014 all seven at one constant size and tracking. 13px is the floor; below it nothing is readable in direct sun."
+      },
+      "absent": {
+        "displayName": "Absent (Chivo 600, ink-soft)",
+        "purpose": "Wording that replaces a missing number, in the value's own face and right-aligned into the value's own field, so a row's right edge reads as one family either way. Borrows the value's shape, none of its weight or colour."
+      },
+      "prose": {
+        "displayName": "Prose (Archivo 400)",
+        "purpose": "The foot note, 14px, held to a 68ch measure."
+      },
+      "clock": {
+        "displayName": "Clock (Chivo 600)",
+        "purpose": "The device's own time in the selvedge."
+      },
+      "wordmark": {
+        "displayName": "Wordmark (Archivo 700)",
+        "purpose": "\"Flora\" in the selvedge, uppercase at 0.2em."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "warp-settle",
+        "value": "180ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The one authored moment: a newly dyed stripe settles from scaleX(0.25)/opacity 0 once. Applies only to stripes the device reported gaining, never to a value, never to a tween between counts. Disabled under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "cloth",
+        "value": "480px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Countable band \u2014 live",
+      "kind": "custom",
+      "refersTo": "band-live",
+      "description": "The product's whole answer: a 100-stripe run whose filled count is the percentage.",
+      "html": "<div class=\"ds-band\">\n  <div class=\"ds-band-head\">\n    <span class=\"ds-label\">Soil 1</span>\n    <span class=\"ds-leader\"></span>\n    <span class=\"ds-value\">63<span class=\"ds-unit\">%</span></span>\n  </div>\n  <div class=\"ds-warp\"><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#1f3a5f\"></i><i style=\"background:#1f3a5f\"></i></div>\n</div>",
+      "css": ".ds-band{padding:18px 0;border-bottom:1px solid #948b78;font-family:Archivo,sans-serif}\n.ds-band-head{display:flex;align-items:baseline;gap:10px}\n.ds-label{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#2b2622;white-space:nowrap}\n.ds-leader{flex:1 1 auto;height:1px;background:#a49a88;min-width:12px}\n.ds-warp{display:flex;gap:3px;height:34px;margin-top:10px;flex:1 1 0;min-width:0}\n.ds-warp{gap:1px}\n.ds-value{font-family:Chivo,sans-serif;font-size:36px;font-weight:800;line-height:1;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:#1f3a5f;min-width:4ch;text-align:right;white-space:nowrap}\n.ds-unit{font-size:.4em;font-weight:600;letter-spacing:0;color:#16293f;margin-inline-start:.14em}"
+    },
+    {
+      "name": "Countable band \u2014 unmeasured",
+      "kind": "custom",
+      "refersTo": "band-unmeasured",
+      "description": "The device did not report and never has: a flat ash bar carrying nothing, and no number.",
+      "html": "<div class=\"ds-band\">\n  <div class=\"ds-band-head\">\n    <span class=\"ds-label\">Soil 2</span>\n    <span class=\"ds-leader\"></span>\n    <span class=\"ds-absent\">not measured</span>\n  </div>\n  <div class=\"ds-warp ds-warp--slack\"></div>\n</div>",
+      "css": ".ds-band{padding:18px 0;border-bottom:1px solid #948b78;font-family:Archivo,sans-serif}\n.ds-band-head{display:flex;align-items:baseline;gap:10px}\n.ds-label{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#2b2622;white-space:nowrap}\n.ds-leader{flex:1 1 auto;height:1px;background:#a49a88;min-width:12px}\n.ds-warp{display:flex;gap:3px;height:34px;margin-top:10px;flex:1 1 0;min-width:0}\n.ds-absent{font-family:Chivo,sans-serif;font-size:15px;font-weight:600;color:#6b6558;min-width:4ch;text-align:right;white-space:nowrap}\n.ds-warp--slack{background:#8f8674}"
+    },
+    {
+      "name": "Countable band \u2014 drained",
+      "kind": "custom",
+      "refersTo": "band-drained",
+      "description": "The device reported and has now stopped: the dye has washed out, a countable ghost of where it was, and no number.",
+      "html": "<div class=\"ds-band\">\n  <div class=\"ds-band-head\">\n    <span class=\"ds-label\">Soil 3</span>\n    <span class=\"ds-leader\"></span>\n    <span class=\"ds-absent\">no longer reporting</span>\n  </div>\n  <div class=\"ds-warp ds-warp--drained\"><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"margin-left:3px\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i><i style=\"background:#8a8170\"></i></div>\n</div>",
+      "css": ".ds-band{padding:18px 0;border-bottom:1px solid #948b78;font-family:Archivo,sans-serif}\n.ds-band-head{display:flex;align-items:baseline;gap:10px}\n.ds-label{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#2b2622;white-space:nowrap}\n.ds-leader{flex:1 1 auto;height:1px;background:#a49a88;min-width:12px}\n.ds-warp{display:flex;gap:3px;height:34px;margin-top:10px;flex:1 1 0;min-width:0}\n.ds-absent{font-family:Chivo,sans-serif;font-size:15px;font-weight:600;color:#6b6558;min-width:4ch;text-align:right;white-space:nowrap}\n.ds-warp--drained{background:#b0a695;gap:1px}"
+    },
+    {
+      "name": "Weft row",
+      "kind": "custom",
+      "refersTo": "weft-row",
+      "description": "One air reading on the leader grammar, a size down from the bands, in a fixed decimal place.",
+      "html": "<div class=\"ds-weft-row\">\n  <span class=\"ds-label\">Air humidity</span>\n  <span class=\"ds-leader\"></span>\n  <span class=\"ds-value\">78.2<span class=\"ds-unit\">%</span></span>\n</div>",
+      "css": ".ds-weft-row{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid #a49a88;font-family:Archivo,sans-serif}\n.ds-label{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#2b2622;white-space:nowrap}\n.ds-leader{flex:1 1 auto;height:1px;background:#a49a88;min-width:12px}\n.ds-value{font-family:Chivo,sans-serif;font-size:21px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums;color:#1f3a5f;min-width:8ch;text-align:right;white-space:nowrap}\n.ds-unit{font-size:.75em;font-weight:600;letter-spacing:0;color:#16293f;margin-inline-start:.14em}"
+    },
+    {
+      "name": "Selvedge",
+      "kind": "nav",
+      "refersTo": "selvedge",
+      "description": "The cloth's top edge: wordmark, a two-state connection mark (filled when the pins answered, hollow when they did not), and the device's own clock. No menu.",
+      "html": "<header class=\"ds-selvedge\">\n  <span class=\"ds-mark\">Flora</span>\n  <span class=\"ds-leader\"></span>\n  <span class=\"ds-tick\"></span>\n  <span class=\"ds-clock\">27 May 2026 &middot; 09:41:14</span>\n</header>\n<header class=\"ds-selvedge\">\n  <span class=\"ds-mark\">Flora</span>\n  <span class=\"ds-leader\"></span>\n  <span class=\"ds-tick-idle\"></span>\n  <span class=\"ds-clock\">Device clock unavailable</span>\n</header>",
+      "css": ".ds-selvedge{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #948b78;background:#f2efe4}\n.ds-mark{font-family:Archivo,sans-serif;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#2b2622}\n.ds-leader{flex:1 1 auto;height:1px;background:#a49a88}\n.ds-tick{width:9px;height:9px;flex:none;background:#5f7355}\n.ds-tick-idle{width:9px;height:9px;flex:none;background:transparent;border:1px solid #6b6558}\n.ds-clock{font-family:Chivo,sans-serif;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:#6b6558;white-space:nowrap}"
+    },
+    {
+      "name": "Foot link",
+      "kind": "button",
+      "refersTo": "foot-link",
+      "description": "A plain-text link in the foot of the cloth, wearing the action's indigo rather than a text ink. No pill, no button chrome, no icon.",
+      "html": "<a class=\"ds-foot-link\" href=\"#\">dankehidayat.my.id</a>",
+      "css": ".ds-foot-link{font-family:Archivo,sans-serif;font-size:14px;line-height:1.6;color:#1f3a5f;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;background:none;border:0;padding:0;cursor:pointer}\n.ds-foot-link:hover{color:#16293f}\n.ds-foot-link:focus-visible{outline:2px solid #1f3a5f;outline-offset:3px}\n"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Counted Cloth",
+    "overview": "Flora is a field instrument rendered as handwoven cloth. A measurement is a count: a value is a run of finished stripes on an undyed cotton ground, and an absent value is a warp left undyed. The palette is natural dye on undyed cloth, the type is set like a countable quantity, the depth model is flat because cloth is flat, and motion is discrete because a count either gains a stripe or it does not. Committed on a restrained ground with a deliberately raised floor: indigo carries the measured bands across the large share of the surface, the other dyes are rare accents that each do exactly one job, and the ground is never dyed or tinted. Colorizing this system did not mean adding hues; it meant lifting the pale half of the cloth, because every value that means 'not a measurement' used to sit between 1.09:1 and 2.25:1 on the ground and vanished in direct sun. There are no images of any kind \u2014 an icon or a photograph would assert something the device did not measure.",
+    "keyCharacteristics": [
+      "A value is a count of stripes, never a chart, gauge, dial, or gradient-filled bar.",
+      "An unmeasured field is visibly unmeasured, and visibly different from a drained one.",
+      "One saturated dye carries the measurement; the ground stays undyed.",
+      "Labels ride hairline leaders at one constant size, so no label outranks another.",
+      "No state is carried by colour alone, and nothing that means something falls below the Sun Floor.",
+      "English, plain, one-handed, legible at arm's length in direct sun."
+    ],
+    "rules": [
+      {
+        "name": "The Undyed Rule",
+        "body": "The ground is never dyed, tinted, or gradient-filled, and no background treatment ever implies a value. A field not carrying a measurement stays undyed cloth.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed Place Rule",
+        "body": "Every measured quantity occupies a fixed decimal place and a fixed width. A value changing between polls may not resize, reflow, or shift the layout around it; its field is allocated before its content is known.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sun Floor Rule",
+        "section": "colors",
+        "body": "Nothing that carries meaning sits below 3:1 on the ground, and no non-text surface below 2.09:1. The design's binding constraint is direct sunlight at arm's length; a value, a leader, or an absent state that cannot be seen outdoors is not finished, however correct it is in a screenshot on a desk. This is why the undyed side of the cloth is deeper than a first instinct for delicacy would make it, and it is the one rule that overrides 'the ground is never dyed'."
+      },
+      {
+        "name": "The Structure Before Tone Rule",
+        "section": "colors",
+        "body": "When two states are close in tone, they are told apart by structure. Slack is a flat bar with no stripe at all; a drained run is 100 discrete stripes. The connected tick is a filled square, the waiting tick a filled square in ash, the disconnected tick a hollow void. Kebom and the void sit within 1.07:1 of each other, so no state on this page is ever carried by colour alone."
+      },
+      {
+        "name": "The One Flash Rule",
+        "section": "colors",
+        "body": "Sumatan marks exactly one thing: a reading that changed on this poll. It lands on the stripe that changed as well as on the number, because the stripe is the thing that changed. It never appears on a page's first reading, never persists past one poll, and is never a warning colour, a threshold, or a resting state."
+      },
+      {
+        "name": "The No Jargon Rule",
+        "body": "No part number, no protocol name, and no unit the grower has no reason to know appears in the interface. Raw sensor values are fetched and carried, and never displayed.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Cloth Rule",
+        "body": "If a proposed treatment needs a shadow, a glow, or a gradient to be legible, the information hierarchy is wrong. Fix the hierarchy, not the treatment.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do set every measured value as a countable run of stripes whose filled count is the value, with the unit stated once beside it in a quieter size and weight than the number.",
+      "Do leave an unmeasured field undyed, slack, or drained, and say in words that the device did not report it.",
+      "Do keep \"never reported\" and \"stopped reporting\" visually and verbally distinct.",
+      "Do label every reading on a hairline leader at one constant label size, so the three probes read as peers and no label outranks another.",
+      "Do let a value land in a single discrete step, one stripe per reported point, in a fixed decimal place.",
+      "Do spend indigo on the measurement and keep the ground undyed, so the eye lands on the number first at arm's length in sun.",
+      "Do hold every meaning-bearing mark at or above the Sun Floor, and tell close states apart by structure rather than by tone.",
+      "Do load only the font weights the page uses, and keep each role on one size, one weight, and one face across every screen and state.",
+      "Do write plain English with no unexplained technical vocabulary, and a full stop as the decimal separator (29.4 \u00b0C)."
+    ],
+    "donts": [
+      "Don't add cards, panels, tiles, charts, sparklines, trends, history, thresholds, or alerts. Lean is the constraint, not a missing feature.",
+      "Don't use gradients, glass, backdrop blur, drop shadows, hover lift, or any radius.",
+      "Don't let a failed pin render as 0 inside the rhythm, or keep showing its last value as though it were current.",
+      "Don't tween, ease, or interpolate a value between two counts.",
+      "Don't use colour as a verdict: no red for \"dry\", no green for \"healthy\", no badge that tells the grower what to do. The product reports measurements and does not decide.",
+      "Don't use icons as labels, and don't use photography, illustration, or texture rasters.",
+      "Don't add a second dye to a field that carries no measurement.",
+      "Don't let the stripes wobble, feather, or gradient-fade into craft decoration, and don't wrap the count into a miniature to save space.",
+      "Don't flash a reading that has just arrived for the first time; only a change flashes.",
+      "Don't let a unit, an absent wording, or a title be set at the same size as the role it sits beside, and don't let an absence reflow the row it is standing in for.",
+      "Don't lighten the cloth's undyed side for delicacy. A leader or a remainder that is beautiful on a desk and invisible at noon in a field is a defect.",
+      "Don't restore \"PT. Labdha Teknika Nusantara\" anywhere, metadata included, and don't reintroduce a language the product has not been told to speak."
+    ]
+  }
+}

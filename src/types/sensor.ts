@@ -1,42 +1,29 @@
-export interface SensorData {
-  v0: number; // Temperature from AHT20
-  v1: number; // Humidity from AHT20
-  v2: number; // Pressure from BMP280
-  v3: number; // Altitude from BMP280
-  v4: number; // Soil 1 moisture %
-  v5: number; // Soil 2 moisture %
-  v6: number; // Soil 3 moisture %
-  v7: number; // Soil 1 raw value
-  v8: number; // Soil 2 raw value
-  v9: number; // Soil 3 raw value
-  v10: number; // Year
-  v11: number; // Month
-  v12: number; // Day
-  v13: number; // Hour
-  v14: number; // Minute
-  v15: number; // Second
-  timestamp?: string;
+/**
+ * Pin readings as reported by the device.
+ *
+ * A `null` value means the pin did not report: the fetch failed, timed out, or
+ * returned something that is not a finite number. `null` is deliberately never
+ * coerced to `0`, because a transport failure and a real reading of zero are
+ * different facts and the interface must be able to tell them apart.
+ */
+export type PinReadings = Record<string, number | null>;
+
+export interface SensorResponse {
+  success: boolean;
+  /** Present when `success` is true. Missing pins are `null`, not absent. */
+  readings?: PinReadings;
+  /** When the route assembled this payload. */
+  measuredAt: string;
+  error?: string;
 }
 
-export interface DashboardStats {
-  temperature: number;
-  humidity: number;
-  pressure: number;
-  altitude: number;
-  soilMoisture: {
-    soil1: { percentage: number; raw: number };
-    soil2: { percentage: number; raw: number };
-    soil3: { percentage: number; raw: number };
-  };
-  rtcTime: {
-    year: number;
-    month: number;
-    day: number;
-    hour: number;
-    minute: number;
-    second: number;
-    formatted: string;
-    fullFormatted: string;
-  };
-  lastUpdate: string; // Add this line to fix the error
-}
+/**
+ * The three states a countable band can be in.
+ *
+ * - `live`        the device reported a value on the latest poll
+ * - `unmeasured`  the device did not report, and never has on this page
+ *                 (rendered slack, in ash, carrying nothing)
+ * - `drained`     the device reported before and has now stopped
+ *                 (rendered drained, keeping only a ghost of the last dye)
+ */
+export type BandState = "live" | "unmeasured" | "drained";

@@ -1,86 +1,616 @@
 @import "tailwindcss";
 
-/* Custom styles */
-@layer utilities {
-  /* Custom scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
+/* ==========================================================================
+   Flora — Lurik / Tenun
+   A value is a count of finished stripes. An unmeasured field is undyed.
+   See DESIGN.md. Nothing in this file may use a gradient, a shadow, a blur,
+   a radius, or a colour outside the four dyes and the undyed ground.
+   ========================================================================== */
+
+@theme {
+  /* Ground: undyed cotton. Never dyed, never tinted. */
+  --color-cotton: #f2efe4;
+
+  /*
+   * The undyed remainder of a run, and the background the stripes sit on.
+   * This was #eae5d8 — 1.09:1 against the ground, which is to say invisible.
+   * Outdoors in direct sun the whole 100-stripe extent of a band simply
+   * disappeared, and a count whose end you cannot see is not a count. Deepened
+   * to 2.09:1: unmistakably cloth, still 4.8x lighter than the dye.
+   */
+  --color-warp: #b0a695;
+
+  /* The only ink that carries words. */
+  --color-ink: #2b2622;
+  --color-ink-soft: #6b6558; /* 5.03:1 on cotton — still AA at body size */
+
+  /* Indigo: the measurement itself. The most saturated ink in the system. */
+  --color-indigo: #1f3a5f;
+  /*
+   * The quiet half of a measurement, and the one heading on the page. Deeper
+   * than the value's own indigo, so it reads as a step down rather than a
+   * rival: a unit belongs to its number, and a title belongs to the page.
+   */
+  --color-indigo-deep: #16293f;
+
+  /*
+   * Kebom: the weft's colour key. Connection state only, never the soil.
+   * Deepened from #7a8c6e. It dresses a single 9px mark, and at 3.14:1 that
+   * mark had no margin left once direct sun took its contrast away. 4.48:1 now,
+   * still legibly a green, and still 2.23:1 from indigo so it can never be
+   * mistaken for the measurement dye.
+   */
+  --color-kebom: #5f7355;
+
+  /* Sumatan: the arrival flash, and only that. */
+  --color-sumatan: #8c3a2b;
+
+  /*
+   * The two absent states. They were 2.25:1 and 1.45:1 — the entire
+   * "the device did not measure" half of the design lived between 1.09:1 and
+   * 2.25:1, i.e. below the threshold of seeing. Both now clear 3.1:1, and
+   * they are told apart by structure, not by tone: slack is a flat bar with
+   * no stripe at all, drained is a striped run carrying a ghost of the count.
+   */
+  --color-slack: #8f8674; /* 3.13:1 — flat ash, no stripe structure at all */
+  --color-drained: #8a8170; /* 3.30:1 — the dye has washed out of the cloth */
+
+  /*
+   * Hairlines and selvedge rules. The leader is the system's whole grammar:
+   * it points from a name to a number. At 1.31:1 it pointed at nothing in
+   * sunlight, so the two structural lines now sit where a 1px rule can be
+   * seen, with the selvedge a step above the leader because it separates.
+   */
+  --color-selvedge: #948b78; /* 2.93:1 */
+  --color-leader: #a49a88; /* 2.41:1 */
+
+  --font-value: var(--font-chivo), "Helvetica Neue", Arial, sans-serif;
+  --font-label: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
+
+  /*
+   * The spacing rhythm is the bespoke rules below, not Tailwind's scale. The
+   * `--spacing` override has gone: it set 0.25rem, which is what Tailwind
+   * already defaults to, and no utility on this surface consumes a spacing step
+   * anyway.
+   */
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
   }
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f8fafc;
-    border-radius: 4px;
+  html {
+    -webkit-text-size-adjust: 100%;
   }
 
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
+  body {
+    background-color: var(--color-cotton);
+    color: var(--color-ink);
+    font-family: var(--font-label);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+  /* Browser surfaces are part of the design: selection, focus, scrollbar. */
+  ::selection {
+    background-color: var(--color-indigo);
+    color: var(--color-cotton);
   }
 
-  /* Gradient text animation */
-  .gradient-text {
-    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
-    background-size: 200% 200%;
-    animation: gradient-shift 4s ease infinite;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  :focus-visible {
+    outline: 2px solid var(--color-indigo);
+    outline-offset: 3px;
   }
 
-  /* Soft shadow utilities */
-  .shadow-soft {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
-      0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  * {
+    scrollbar-color: var(--color-slack) var(--color-cotton);
   }
 
-  .shadow-soft-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
-      0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
   }
 
-  /* Glass morphism effect */
-  .glass {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+  *::-webkit-scrollbar-track {
+    background: var(--color-cotton);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-slack);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-soft);
   }
 }
 
-@keyframes gradient-shift {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
+@layer components {
+  /* --- the cloth ------------------------------------------------------- */
 
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 1;
+  /*
+   * The cloth is a column that is never shorter than the screen, so the hem
+   * lands on the fold instead of wherever the last reading happened to stop.
+   * The free space is absorbed by the weft strip's bottom margin, not by the
+   * foot's top margin — that way a cloth too tall for the screen still keeps its
+   * 32px gap to the sign, instead of collapsing to nothing.
+   */
+  .cloth {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-cotton);
+    padding-inline: 20px;
   }
-  50% {
-    opacity: 0.8;
-  }
-}
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
+  @media (min-width: 480px) {
+    .cloth {
+      padding-inline: 28px;
+    }
   }
-  50% {
-    transform: translateY(-5px);
-  }
-}
 
-/* Smooth transitions */
-* {
-  transition: all 0.2s ease-in-out;
+  .cloth-body {
+    max-width: 720px;
+    margin-inline: auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cloth-body > main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* --- the selvedge: the cloth's own edge, not a navbar ------------------ */
+
+  .selvedge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-block: 14px;
+    border-bottom: 1px solid var(--color-selvedge);
+  }
+
+  .selvedge-mark {
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  .selvedge-clock {
+    font-family: var(--font-value);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-soft);
+    white-space: nowrap;
+  }
+
+  /*
+   * The weft's colour key: the system's proof that state is never carried by
+   * colour alone.
+   *
+   * It had three states and now has two. The third was "waiting", and it was
+   * surplus: before the first poll every band already reads "waiting" and its
+   * warp is undyed, so the mark repeated what the cloth said four lines below
+   * it. Dropping it also fixed a real defect. The waiting mark was slack and the
+   * live mark was kebom, and those two greys measured 1.005:1 against each
+   * other — the same tone, separated only by hue, which is nothing at all once
+   * the sun flattens it.
+   *
+   * What is left is told apart by shape, which sunlight cannot flatten: a filled
+   * square when the pins answered, a hollow one when they did not.
+   */
+  .tick {
+    width: 9px;
+    height: 9px;
+    flex: none;
+  }
+
+  .tick--live {
+    background-color: var(--color-kebom);
+  }
+
+  .tick--idle {
+    background-color: transparent;
+    border: 1px solid var(--color-ink-soft);
+  }
+
+  /* --- labels and leaders ---------------------------------------------- */
+
+  /*
+   * One label size, everywhere, for all seven readings. This was 11px for the
+   * probe names and 12px sentence-case for the air readings, so the system's
+   * own rule — no label outranks another — was being broken by its own CSS,
+   * and the probe name that tells you what the number means was the smallest
+   * ink on the page in a product whose one hard constraint is direct sun.
+   * 13px is the floor; everything below it is unreadable outdoors.
+   */
+  .label {
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    white-space: nowrap;
+  }
+
+  /*
+   * The page title. The only heading on the page, and deliberately modest:
+   * the largest ink belongs to the measurement, not to the heading. It takes
+   * its rank from hue rather than from size — indigo-deep, the quietest
+   * form of the measurement dye — because a hue step survives glare at a
+   * distance in a way that three pixels of type size does not.
+   */
+  .title {
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: 0;
+    color: var(--color-indigo-deep);
+    margin: 0;
+    padding-block: 20px 2px;
+    text-wrap: balance;
+  }
+
+  /*
+   * The hairline leader that runs from a label out to its value.
+   *
+   * Its floor is 20px rather than 12px because a leader squeezed to a stub
+   * reads as a hyphen, and the wording that squeezes it is the absent wording —
+   * so the thread used to disappear precisely when the row was least normal. At
+   * 320px, where the cloth is 280px wide, 20px still fits beside the longest
+   * label and the widest absent wording with room to spare.
+   */
+  .leader {
+    flex: 1 1 auto;
+    height: 1px;
+    background-color: var(--color-leader);
+    min-width: 20px;
+  }
+
+  /* The value itself: one face, one size, fixed decimal places. */
+  .value {
+    font-family: var(--font-value);
+    font-weight: 800;
+    font-size: clamp(2.25rem, 10vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-indigo);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  /* The weft strip carries air readings, so its values are a size down. */
+  .value--weft {
+    font-size: 1.3125rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    min-width: 8ch;
+  }
+
+  /*
+   * Altitude: the quiet half of a measurement, and the only reading here that
+   * is a place rather than a condition. It is a real rung down the value
+   * ladder — 21 for the three air conditions, 18 here — and it takes the
+   * deeper half of the measurement dye rather than the deeper one reserved for
+   * absent wording, so it can never be misread as a reading the device failed
+   * to make. Tabular figures and the same 8ch field keep it in the column.
+   */
+  .value--alt {
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-indigo-deep);
+    min-width: 8ch;
+  }
+
+  /*
+   * The unit is part of the quantity, so it keeps the quantity's hue — but it
+   * is the quieter half of one fact, and it now says so. Set at 800 weight in
+   * the value's own size, "63%" was a number and a symbol shouting together,
+   * which is the difference between a counted quantity and a styled one. One
+   * absolute size in both weft contexts, so the two strips stay siblings.
+   */
+  .value .unit {
+    font-size: 0.4em;
+  }
+
+  .value--weft .unit,
+  .value--alt .unit {
+    font-size: 0.75em;
+  }
+
+  /*
+   * One unit rule, not two. There used to be a bare `.unit` block repeating the
+   * weight, tracking and colour that `.value .unit` already set at a higher
+   * specificity, so three of its four declarations could never apply to
+   * anything. Every unit in the interface sits inside a `.value`, so the shared
+   * half belongs here unqualified.
+   */
+  .unit {
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--color-indigo-deep);
+    margin-inline-start: 0.14em;
+  }
+
+  /*
+   * The Fixed Place Rule: a value's field is allocated before its content is
+   * known, so a changing count can never reflow the layout around it. The
+   * fields are wide enough for the longest reading they will ever hold, so the
+   * values sit on one common right edge and read as a column.
+   *
+   * The leaders, though, are deliberately not all the same length: a leader is
+   * the thread running from a name to a number, and the names differ, so the
+   * threads differ. An earlier comment here claimed four equal leaders; they
+   * never were and could not be, and pretending otherwise would have meant
+   * allocating the label as a fixed field and letting the name stop naming.
+   */
+  .value--soil {
+    min-width: 4ch;
+  }
+
+  /*
+   * The absent wording. Set in the value's own face so that a row's right edge
+   * reads as one family whether it is holding a count or the words that stand
+   * in for a missing one, and right-aligned into the same field — an absence
+   * that reflows the row it is standing in for is not occupying the value's
+   * space. It borrows the value's shape and none of its weight or colour.
+   */
+  .value--absent {
+    font-family: var(--font-value);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-soft);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  /* The absent wording occupies the same field as the number it replaces. */
+  .band-head .value--absent {
+    min-width: 4ch;
+  }
+
+  .weft-row .value--absent,
+  .alt-row .value--absent {
+    min-width: 8ch;
+  }
+
+  /* --- the countable band: the signature -------------------------------- */
+
+  .band {
+    padding-block: 18px;
+    border-bottom: 1px solid var(--color-selvedge);
+  }
+
+  /*
+   * The last band gives up its bottom rule, because the weft strip's seam takes
+   * that job over. Two rules a few pixels apart would say "the answer ended and
+   * something else began" twice, in two tones; one rule says it once, in the
+   * tone that separates rather than points.
+   */
+  .band:last-of-type {
+    border-bottom: 0;
+  }
+
+  .band-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  /*
+   * The warp run. Ten decades of ten stripes, separated by a hairline gap, so
+   * the count is exact (one stripe is one percentage point) and a person can
+   * still count by tens at arm's length in direct sun. The stripes flex, so
+   * the count is never compressed to fit a narrower screen.
+   */
+  .warp {
+    display: flex;
+    gap: 3px;
+    height: 34px;
+    margin-top: 10px;
+  }
+
+  @media (min-width: 480px) {
+    .warp {
+      height: 44px;
+    }
+  }
+
+  .decade {
+    flex: 1 1 0;
+    display: flex;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .stripe {
+    flex: 1 1 0;
+    min-width: 0;
+    background-color: var(--color-warp);
+    transform-origin: left center;
+  }
+
+  .stripe--dyed {
+    background-color: var(--color-indigo);
+  }
+
+  /*
+   * Slack: the warp was never dyed. A flat bar of ash with no stripe
+   * structure at all, so it can never be miscounted as a run of low values.
+   */
+  .warp--slack {
+    background-color: var(--color-slack);
+  }
+
+  .warp--slack .stripe {
+    background-color: transparent;
+  }
+
+  /*
+   * Drained: the dye has washed out. The run keeps its full 100-unit extent on
+   * the same undyed warp a live band uses, and the stripes the device last
+   * dyed are still countable in a ghost ink — so the band says "it was here,
+   * and the counting has stopped" using the component's own grammar, instead
+   * of a pale slab that vanished in sun. No number is shown, because the
+   * device is not reporting one.
+   */
+  .warp--drained {
+    background-color: var(--color-warp);
+  }
+
+  .stripe--ghost {
+    background-color: var(--color-drained);
+  }
+
+  /* --- the weft strip --------------------------------------------------- */
+
+  /*
+   * The seam between the answer and the context. It is the only rule in the
+   * strip and it is a selvedge, not a leader, so it separates where the leaders
+   * only point. The 18px under the last stripe run plus these two steps is
+   * roughly three times the gap between two soil bands: the boundary between
+   * groups is unmistakably wider than the gap inside one.
+   */
+  .weft {
+    margin-top: 16px;
+    margin-bottom: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-selvedge);
+  }
+
+  /*
+   * The three air conditions, packed tight. They carried a leader-tone rule
+   * under every row, which made the strip read as a ruled table and put three
+   * more hairlines on a page that already had seven. The rows are peers
+   * already: they share one label size, one value size, one right edge, and one
+   * cadence. Proximity says "these three belong together" without a line.
+   */
+  .weft-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-block: 9px;
+  }
+
+  /*
+   * Altitude, alone. The largest interval inside the strip, no rule beneath
+   * it, and a rung down the value ladder: the eye reads a closed block of three
+   * and then a single line, which is the whole of the distinction. Nothing here
+   * softens the number to make the point — the point is made by where the
+   * number stands.
+   */
+  .alt-row {
+    padding-block: 20px 0;
+  }
+
+  /* --- the hem of the cloth --------------------------------------------- */
+
+  /*
+   * The foot is one line, so it gets the loosest interval on the page and
+   * nothing else. Its bottom rule is gone: it sat below the last element of the
+   * document, separating the cloth from an absence. The cloth now ends on
+   * undyed ground.
+   */
+  .foot {
+    margin-top: 32px;
+    padding-block: 18px 44px;
+    border-top: 1px solid var(--color-selvedge);
+  }
+
+  /*
+   * The maker's mark, right-anchored to the value edge so the cloth is signed
+   * on the same edge every number in it ends on, and set at the 13px rung in
+   * the darkest ink. It is the last note of the page's descending ladder: 39 for
+   * the soil, 21 for the air, 18 for the place, 13 for the sign.
+   */
+  .sign {
+    margin: 0;
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    text-align: right;
+    color: var(--color-ink);
+  }
+
+  /*
+   * Prose. It is the 404's body and nothing else: the foot's paragraph is gone,
+   * so the one remaining passage of running text on the site is held to 14px
+   * and a 68ch measure, and the eye returns to the start of a line without
+   * hunting.
+   */
+  .prose {
+    font-family: var(--font-label);
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-ink-soft);
+    max-width: 68ch;
+    text-wrap: pretty;
+  }
+
+  /* --- the one authored moment ------------------------------------------ */
+
+  /*
+   * A new reading does not slide. One stripe arrives and settles over 180ms.
+   * Nothing tweens between two values.
+   *
+   * Sumatan is the whole of the arrival flash, and it is on the stripe rather
+   * than only on the number: the flash has to name the thing that changed, and
+   * the stripe is the thing that changed. It drains to indigo on the next poll
+   * on its own, because the next poll only marks the stripes the device
+   * reported gaining since. One authored moment, arriving and gone.
+   */
+  @keyframes warp-settle {
+    from {
+      opacity: 0;
+      transform: scaleX(0.25);
+    }
+    to {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+
+  .stripe--dyed.stripe--new {
+    background-color: var(--color-sumatan);
+    animation: warp-settle 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .value--flash {
+    color: var(--color-sumatan);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stripe--dyed.stripe--new {
+      animation: none;
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
 }
