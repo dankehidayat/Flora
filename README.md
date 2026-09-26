@@ -1,16 +1,43 @@
-# FloraPro - Environmental Monitoring System
+# Flora
+
+A live readout of soil and air from a field monitor. One plot, the current
+reading, and nothing the device did not measure.
 
 ## Overview
 
-FloraPro is an IoT environmental monitoring system that tracks real-time environmental conditions and soil moisture levels using ESP32 microcontrollers and multiple sensors.
+Flora is an IoT environmental monitoring system. An ESP32 reads a set of
+sensors in the field and publishes each reading to Blynk; a Next.js app reads
+them back and shows the current state of the soil and the air on one screen.
+
+The interface shows **the current reading only**. There is no history, no
+chart, no threshold and no alerting. A value the device did not read is never
+displayed as a number — absence is shown as absence, so an outage can never be
+mistaken for a real reading of zero.
+
+## The readout
+
+The dashboard is drawn as a handloom rather than a dashboard of cards. A
+moisture value is a **count of finished stripes** on a 100-stripe run, where
+one stripe is one percentage point, so a reported value is exact and countable
+rather than approximated by a gauge or a curve.
+
+Each soil probe is in one of three states, and each renders differently:
+
+| State        | Meaning                                     | Rendering                     |
+| ------------ | ------------------------------------------- | ----------------------------- |
+| `live`       | The device reported a value on this poll   | Stripes filled to the value   |
+| `drained`    | Reported before, has now stopped            | Ghost run, no number shown    |
+| `unmeasured` | Never reported                              | Flat bar carrying nothing     |
+
+Only `live` shows a number.
 
 ## Features
 
-- Real-time temperature, humidity, and pressure monitoring
-- Three soil moisture sensors with percentage readings
-- Precise RTC time synchronization
-- Responsive web dashboard
-- Professional glass morphism design
+- Three soil moisture probes rendered as countable stripe runs
+- Air temperature, humidity, pressure and altitude in a single weft strip
+- Device RTC clock, read from the device rather than the browser
+- Independent pin settlement: one failed sensor never blanks the others
+- Plain-English interface, legible in direct sun on a phone
 
 ## Hardware Components
 
@@ -30,16 +57,19 @@ FloraPro is an IoT environmental monitoring system that tracks real-time environ
 
 ### Frontend
 
-- Next.js 16 with TypeScript
+- Next.js 16 (App Router) with React 19 and TypeScript
 - Tailwind CSS v4
-- Phosphor Icons
-- Real-time data updates
+- All user-facing strings live in `src/app/copy.ts`
+- No icon library and no charting library
+- Polls every 5 seconds
 
 ### Backend
 
-- Next.js API Routes
-- Blynk IoT Platform integration
-- 5-second data refresh intervals
+- Next.js API Route at `/api/sensor-data`
+- Reads each pin from Blynk independently, with a 3-second timeout per pin
+- Returns `null` for any pin that did not report — never `0`
+- Returns `200` with `null` values in `readings`; the route itself succeeded,
+  and the nulls carry the truth
 
 ### Firmware
 
@@ -48,57 +78,96 @@ FloraPro is an IoT environmental monitoring system that tracks real-time environ
 - RTC time synchronization
 - Multi-sensor data collection
 
+## Sensor and pin map
+
+The pin map is fixed by the firmware and is not open to redesign.
+
+| Pin(s)   | Reading                                        | Shown |
+| -------- | ---------------------------------------------- | ----- |
+| `v0`     | Air temperature (°C), AHT20                    | Yes   |
+| `v1`     | Air humidity (%), AHT20                        | Yes   |
+| `v2`     | Air pressure (hPa), BMP280                     | Yes   |
+| `v3`     | Altitude (m), BMP280                           | Yes   |
+| `v4-v6`  | Soil moisture percentages, one per probe       | Yes   |
+| `v7-v9`  | Raw soil probe values                          | No    |
+| `v10-v15`| Device RTC fields                              | Clock |
+
+Raw probe values (`v7-v9`) are fetched but deliberately not displayed: an
+unexplained number is not a reading a grower can act on.
+
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── api/sensor-data/route.ts
+│   ├── api/
+│   │   └── sensor-data/route.ts   Blynk fetch, per-pin timeout, null on failure
 │   ├── components/
-│   │   ├── ui/card.tsx
-│   │   ├── navbar.tsx
-│   │   ├── rtc-display.tsx
-│   │   ├── sensor-card.tsx
-│   │   ├── soil-moisture-gauge.tsx
-│   │   └── status-indicator.tsx
+│   │   ├── foot.tsx               attribution and scope
+│   │   ├── selvedge.tsx           device clock and connection mark
+│   │   ├── soil-band.tsx          one probe: label, stripe run, value
+│   │   ├── warp-run.tsx           the 100-stripe countable run
+│   │   └── weft-strip.tsx         the four air readings
+│   ├── copy.ts                    every user-facing string
 │   ├── globals.css
 │   ├── layout.tsx
-│   └── page.tsx
-├── lib/utils.ts
-└── types/sensor.ts
+│   ├── not-found.tsx
+│   └── page.tsx                   poll loop, pin state, layout
+└── types/
+    └── sensor.ts                  PinReadings, SensorResponse, BandState
 ```
+
+The product constraints are recorded in `PRODUCT.md` and the design system in
+`DESIGN.md`.
 
 ## Installation
 
-1. Install dependencies:
+1. Install dependencies (pnpm — a `pnpm-lock.yaml` is committed):
 
 ```bash
-npm install
+pnpm install
 ```
 
-2. Configure environment variables in `.env.local`:
+2. Configure environment variables in `.env` (Next also reads `.env.local`):
 
 ```env
 BLYNK_BASE_URL=http://iot.serangkota.go.id:8080
 BLYNK_AUTH_TOKEN=your_auth_token_here
 ```
 
+`.env` is git-ignored. Both variables are required; without them the route
+reports that Blynk is not configured rather than showing empty readings. Note
+the error message names `.env.local` — either filename works.
+
 3. Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
+
+## Scripts
+
+| Command      | Purpose                          |
+| ------------ | -------------------------------- |
+| `pnpm dev`   | Development server               |
+| `pnpm build` | Production build                 |
+| `pnpm start` | Serve the production build       |
+| `pnpm lint`  | ESLint                          |
+
+To type-check: `npx tsc --noEmit`. Note that `next.config.ts` currently sets
+`ignoreBuildErrors` and `ignoreDuringBuilds`, so `pnpm build` does not enforce
+either — run them directly if you want them to gate a commit.
 
 ## Sensor Data
 
 The system monitors:
 
-- Temperature (°C) from AHT20
-- Humidity (%) from AHT20
-- Pressure (hPa) from BMP280
+- Air temperature (°C) from AHT20
+- Air humidity (%) from AHT20
+- Air pressure (hPa) from BMP280
 - Altitude (m) from BMP280
 - Soil moisture levels from 3 sensors
-- Real-time RTC clock data
+- The device's own RTC clock
 
 ## License
 
